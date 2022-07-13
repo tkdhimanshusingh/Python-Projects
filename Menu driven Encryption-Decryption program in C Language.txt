@@ -1,0 +1,171 @@
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+int fileentry();
+int fileread();
+int encrypt();
+int decrypt();
+int menudrive();
+
+/*main function is calling fileentry that makes entry in file f1.txt
+and then main is calling menudrive function, that asks user whether to
+Display the data/Encrypt the data/Decrypt the data/End the program*/
+int main()
+{
+	fileentry();
+	menudrive();
+	return 0;
+}
+
+/*menudrive function asks user whether to:
+(1)Display the data/
+(2)Encrypt the data/
+(3)Decrypt the data/
+(4)End the program*/
+int menudrive()
+{
+	int choice;
+	printf("\n\n\nWhat do you want to do ?\nEnter 1 to see the written content of your file.\nEnter 2 to Encrypt your file.\nEnter 3 to decrypt your file.\nEnter 4 to end program\n\n\n");
+	scanf("%d",&choice);
+	switch(choice)
+	{
+		case 1:fileread();menudrive();break;
+		case 2:encrypt();menudrive();break;		
+		case 3:decrypt();menudrive();break;       
+		case 4:return 0;break;
+		default:printf("enter valid choice(1-3):");menudrive();
+	}
+}
+
+//fileentry is a function taking entry in file name f1.txt.
+int fileentry()
+{
+	FILE *infile;
+	infile=fopen("f1.txt","w");
+	char ch[100];
+	int i;
+	if(infile==	NULL)
+	{
+		printf("Sorry unable to open file");
+		exit(1);
+	}
+	printf("Please do entry in file:\n");
+	gets(ch);
+	fflush(stdin);
+	for(i=0;i<strlen(ch);i++)
+	{
+		fflush(stdin);
+		fputc(ch[i],infile);
+	}
+	fclose(infile);
+	return 0;
+}
+
+//fileread is a function that is reading the contents of file f1.txt
+int fileread()
+{
+	FILE *outfile;
+	outfile=fopen("f1.txt","r");
+	if(outfile==NULL)
+	{
+		printf("sorry unable to open file.");
+		exit(1);
+	}
+	char ch;
+	printf("Content written in the file is:\n");
+	while(!feof(outfile))
+	{
+		fflush(stdin);
+		ch=fgetc(outfile);
+		printf("%c",ch);
+	}
+	fclose(outfile);
+	return 0;
+}
+
+/*encrypt is a function that is encrypting the content written in the 
+file by adding 10 to the ASCII code of content written.
+and also calling fileread function to display encrypted content.*/
+int encrypt()
+{
+    int i,m=10;
+	char ch;
+	FILE *encrypt,*inflow;
+	encrypt=fopen("f1.txt","r");
+	inflow=fopen("f2.txt","w");
+	if(encrypt==NULL||inflow==NULL)
+	{
+		printf("Sorry file unable to open during encryption");
+		return(0);
+	}
+	while(!feof(encrypt))
+	{
+		fflush(stdin);
+		ch=fgetc(encrypt);
+		ch=(int)ch+m;
+		fputc(ch,inflow);
+	}
+	fclose(encrypt);
+	fclose(inflow);
+	encrypt=fopen("f1.txt","w");
+	inflow=fopen("f2.txt","r");
+	while(!feof(inflow))
+	{
+		fflush(stdin);
+		ch=fgetc(inflow);
+		fputc(ch,encrypt);
+	}
+	fclose(encrypt);
+	fclose(inflow);
+	printf("encrypted content is:\n");
+	fileread();
+	return 0;
+}
+
+/*decrypt is a password protected function that is decrypting the content written in the 
+file by subtracting 10 to the ASCII code of content written.
+and also calling fileread function to display decrypted content.*/
+int decrypt()
+{   int pass,m=10;
+	char ch;
+	FILE *decrypt,*outflow;
+	decrypt=fopen("f1.txt","r");
+	outflow=fopen("f2.txt","w");
+	printf("enter password to decrypt the file:\n");
+	scanf("%d",&pass);
+	if(pass!=321)
+	{
+		printf("sorry wrong password, can't be decrypted");
+	    menudrive();
+	}
+	else if(decrypt==NULL||outflow==NULL)
+	{
+		printf("sorry unable to open files during decryption");
+	}
+	else
+	{
+		printf("Decrypted content is:\n");
+		while(!feof(decrypt))
+		{
+			fflush(stdin);
+			ch=fgetc(decrypt);
+			ch=(int)ch-m;
+			printf("%c",ch);
+			fputc(ch,outflow);
+		}
+	}
+	fclose(decrypt);
+	fclose(outflow);
+	decrypt=fopen("f1.txt","w");
+	outflow=fopen("f2.txt","r");
+	while(!feof(outflow))
+	{
+		fflush(stdin);
+		ch=fgetc(outflow);
+		fputc(ch,decrypt);
+	}
+	fclose(decrypt);
+	fclose(outflow);
+	return 0;
+}
